@@ -1,0 +1,35 @@
+.exchange-result {
+    padding: 15px;
+    background-color: #f8f9fa;
+    border-radius: 4px;
+}
+
+.exchange-result p {
+    margin-bottom: 10px;
+}
+
+.card {
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    border: none;
+    margin-bottom: 20px;
+}
+
+.card-title {
+    color: #333;
+    font-weight: 600;
+}
+
+.form-select {
+    border: 1px solid #ddd;
+    border-radius: 4px;
+}
+
+.form-select:focus {
+    border-color: #007bff;
+    box-shadow: 0 0 5px rgba(0, 123, 255, 0.3);
+}
+
+.badge {
+    font-size: 0.9rem;
+    padding: 8px 12px;
+}

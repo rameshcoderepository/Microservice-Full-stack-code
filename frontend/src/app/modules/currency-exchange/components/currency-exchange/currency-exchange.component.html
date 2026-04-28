@@ -1,0 +1,93 @@
+<div class="container mt-5">
+    <div class="row">
+        <div class="col-md-12">
+            <h2>Currency Exchange Rates</h2>
+            <p class="text-muted">Get real-time currency exchange rates</p>
+        </div>
+    </div>
+
+    <div class="row mt-4">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Get Exchange Rate</h5>
+                    <form [formGroup]="exchangeForm" (ngSubmit)="getExchangeRate()">
+                        <div class="form-group mb-3">
+                            <label for="from">From Currency:</label>
+                            <select id="from" formControlName="from" class="form-select">
+                                <option *ngFor="let curr of currencies" [value]="curr">
+                                    {{ curr }}
+                                </option>
+                            </select>
+                        </div>
+
+                        <div class="form-group mb-3">
+                            <label for="to">To Currency:</label>
+                            <select id="to" formControlName="to" class="form-select">
+                                <option *ngFor="let curr of currencies" [value]="curr">
+                                    {{ curr }}
+                                </option>
+                            </select>
+                        </div>
+
+                        <div class="alert alert-danger" *ngIf="error">
+                            {{ error }}
+                        </div>
+
+                        <button type="submit" class="btn btn-primary" [disabled]="loading">
+                            <span *ngIf="!loading">Get Rate</span>
+                            <span *ngIf="loading">Loading...</span>
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="card" *ngIf="exchangeRates">
+                <div class="card-body">
+                    <h5 class="card-title">Exchange Rate Details</h5>
+                    <div class="exchange-result">
+                        <p>
+                            <strong>From:</strong>
+                            {{ exchangeRates.from }} - {{ exchangeRates.fromCurrencyDescription }}
+                        </p>
+                        <p>
+                            <strong>To:</strong>
+                            {{ exchangeRates.to }} - {{ exchangeRates.toCurrencyDescription }}
+                        </p>
+                        <p>
+                            <strong>Rate:</strong>
+                            <span class="badge bg-success">
+                                {{ exchangeRates.conversionMultiple }}
+                            </span>
+                        </p>
+                        <p class="text-muted">
+                            <small>Port: {{ exchangeRates.port }}</small>
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card" *ngIf="!exchangeRates && !loading">
+                <div class="card-body">
+                    <p class="text-muted">Select currencies and click "Get Rate" to see exchange rates</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row mt-4">
+        <div class="col-md-12">
+            <div class="alert alert-info">
+                <h6>💡 How it works:</h6>
+                <ul>
+                    <li>Select source and destination currencies</li>
+                    <li>Click "Get Rate" to fetch the current exchange rate</li>
+                    <li>The service is load-balanced across multiple instances</li>
+                    <li>View the port information to see which instance handled your request</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>

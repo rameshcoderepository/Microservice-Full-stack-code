@@ -1,0 +1,289 @@
+<div class="container-fluid mt-5">
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <div class="header-card">
+                <h1>🎯 Dashboard</h1>
+                <p class="subtitle" *ngIf="currentUser$ | async as user">
+                    Welcome, <strong>{{ user.username }}</strong>!
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Access Features -->
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <h3 class="section-title">Quick Access</h3>
+        </div>
+        <div class="col-md-4" *ngFor="let feature of features">
+            <div class="feature-card" (click)="navigateTo(feature.link)">
+                <div class="feature-icon">{{ feature.icon }}</div>
+                <h5>{{ feature.title }}</h5>
+                <p>{{ feature.description }}</p>
+                <span class="learn-more">Open →</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Services Status -->
+    <div class="row">
+        <div class="col-md-12">
+            <h3 class="section-title">Microservices Status</h3>
+        </div>
+        <div class="col-md-6" *ngFor="let service of services">
+            <div class="service-card">
+                <div class="service-header">
+                    <h5>{{ service.name }}</h5>
+                    <span class="badge" [ngClass]="'bg-' + getStatusColor(service.status)">
+                        <span class="status-icon">{{ getStatusIcon(service.status) }}</span>
+                        {{ service.status }}
+                    </span>
+                </div>
+                <p class="service-description">{{ service.description }}</p>
+                <div class="service-details">
+                    <div class="detail-item">
+                        <span class="detail-label">Port:</span>
+                        <span class="detail-value">{{ service.port }}</span>
+                    </div>
+                    <div class="detail-item" *ngIf="service.instances">
+                        <span class="detail-label">Instances:</span>
+                        <span class="detail-value">{{ service.instances }}</span>
+                    </div>
+                </div>
+                <button class="btn btn-sm btn-outline-primary mt-3" (click)="openServiceUrl(service)">
+                    Open Service →
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Architecture Overview -->
+    <div class="row mt-4">
+        <div class="col-md-12">
+            <div class="info-card">
+                <h5>📊 Architecture Overview</h5>
+                <div class="architecture-info">
+                    <p><strong>API Gateway (Port 8765)</strong></p>
+                    <p style="margin-left: 20px; margin-top: -10px; font-size: 0.9rem; color: #666;">
+                        ↓<br>
+                        Handles all API requests and routes to appropriate services
+                    </p>
+
+                    <p style="margin-top: 15px;"><strong>Backend Services (Load Balanced)</strong></p>
+                    <div style="margin-left: 20px; font-size: 0.9rem; color: #666;">
+                        <p style="margin: 5px 0;">• Currency Exchange (3 instances: 8000, 8001, 8002)</p>
+                        <p style="margin: 5px 0;">• Currency Conversion (3 instances: 8100, 8101, 8102)</p>
+                        <p style="margin: 5px 0;">• Limits Service (Port 8085)</p>
+                    </div>
+
+                    <p style="margin-top: 15px;"><strong>Infrastructure Services</strong></p>
+                    <div style="margin-left: 20px; font-size: 0.9rem; color: #666;">
+                        <p style="margin: 5px 0;">• Eureka Registry (Port 8761) - Service Discovery</p>
+                        <p style="margin: 5px 0;">• Config Server (Port 8888) - Configuration Management</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Getting Started -->
+    <div class="row mt-4">
+        <div class="col-md-12">
+            <div class="info-card secondary">
+                <h5>🚀 Getting Started</h5>
+                <ul>
+                    <li>Start with <strong>Exchange Rates</strong> to view current rates</li>
+                    <li>Try <strong>Currency Conversion</strong> to convert amounts</li>
+                    <li>Manage <strong>Limits</strong> for transaction configuration</li>
+                    <li>Each request is load-balanced across multiple service instances</li>
+                    <li>View the port information in results to see which instance handled your request</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .container-fluid {
+        max-width: 1200px;
+        margin: 0 auto;
+    }
+
+    .header-card {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 40px;
+        border-radius: 10px;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    }
+
+    .header-card h1 {
+        margin: 0;
+        font-size: 2.5rem;
+    }
+
+    .subtitle {
+        margin: 10px 0 0 0;
+        font-size: 1.1rem;
+        opacity: 0.95;
+    }
+
+    .section-title {
+        color: #333;
+        font-weight: 600;
+        margin-bottom: 20px;
+        padding-bottom: 10px;
+        border-bottom: 2px solid #667eea;
+    }
+
+    .feature-card {
+        background: white;
+        border-radius: 8px;
+        padding: 25px;
+        text-align: center;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        cursor: pointer;
+        transition: all 0.3s ease;
+        margin-bottom: 20px;
+    }
+
+    .feature-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+    }
+
+    .feature-icon {
+        font-size: 3rem;
+        margin-bottom: 15px;
+    }
+
+    .feature-card h5 {
+        color: #333;
+        margin: 15px 0 10px;
+        font-weight: 600;
+    }
+
+    .feature-card p {
+        color: #666;
+        font-size: 0.9rem;
+        margin-bottom: 15px;
+    }
+
+    .learn-more {
+        color: #667eea;
+        font-weight: 600;
+        font-size: 0.9rem;
+    }
+
+    .service-card {
+        background: white;
+        border-radius: 8px;
+        padding: 20px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        margin-bottom: 20px;
+        border-left: 4px solid #667eea;
+    }
+
+    .service-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 10px;
+    }
+
+    .service-header h5 {
+        margin: 0;
+        color: #333;
+        font-weight: 600;
+    }
+
+    .badge {
+        padding: 8px 12px;
+        font-size: 0.8rem;
+        font-weight: 600;
+    }
+
+    .status-icon {
+        margin-right: 5px;
+    }
+
+    .service-description {
+        color: #666;
+        font-size: 0.9rem;
+        margin-bottom: 15px;
+    }
+
+    .service-details {
+        background: #f8f9fa;
+        padding: 10px;
+        border-radius: 4px;
+        margin-bottom: 10px;
+    }
+
+    .detail-item {
+        display: flex;
+        justify-content: space-between;
+        padding: 5px 0;
+        font-size: 0.9rem;
+    }
+
+    .detail-label {
+        color: #555;
+        font-weight: 500;
+    }
+
+    .detail-value {
+        color: #333;
+        font-weight: 600;
+    }
+
+    .info-card {
+        background: white;
+        border-radius: 8px;
+        padding: 25px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        margin-bottom: 20px;
+    }
+
+    .info-card.secondary {
+        background: #f0f4ff;
+        border-left: 4px solid #667eea;
+    }
+
+    .info-card h5 {
+        color: #333;
+        margin-bottom: 15px;
+        font-weight: 600;
+    }
+
+    .info-card ul {
+        margin-bottom: 0;
+        padding-left: 20px;
+    }
+
+    .info-card li {
+        margin-bottom: 8px;
+        color: #555;
+    }
+
+    .architecture-info {
+        background: white;
+        padding: 15px;
+        border-radius: 4px;
+        font-size: 0.95rem;
+    }
+
+    .architecture-info p {
+        margin: 10px 0;
+    }
+
+    .btn-outline-primary {
+        color: #667eea;
+        border-color: #667eea;
+    }
+
+    .btn-outline-primary:hover {
+        background-color: #667eea;
+        border-color: #667eea;
+    }
+</style>

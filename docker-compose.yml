@@ -1,0 +1,277 @@
+services:
+  # Eureka Service Registry (Naming Server)
+  naming-server:
+    build:
+      context: ./naming-server
+      dockerfile: Dockerfile
+    container_name: naming-server
+    ports:
+      - "8761:8761"
+    environment:
+      - SPRING_APPLICATION_NAME=naming-server
+    networks:
+      - microservices-network
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:8761/eureka/apps" ]
+      interval: 10s
+      timeout: 5s
+      start_period: 60s
+      retries: 5
+
+  # Spring Cloud Config Server
+  config-server:
+    build:
+      context: ./spring-cloud-config-server
+      dockerfile: Dockerfile
+    container_name: config-server
+    ports:
+      - "8888:8888"
+    environment:
+      - SPRING_APPLICATION_NAME=spring-cloud-config-server
+      - SPRING_PROFILES_ACTIVE=native
+      - SPRING_CLOUD_CONFIG_SERVER_NATIVE_SEARCH_LOCATIONS=file:///app/config
+    volumes:
+      - ./git-localconfiguration-repository:/app/config
+    depends_on:
+      naming-server:
+        condition: service_healthy
+    networks:
+      - microservices-network
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:8888/actuator/health" ]
+      interval: 10s
+      timeout: 5s
+      start_period: 90s
+      retries: 5
+
+  # Currency Exchange Service (1 instance)
+  currency-exchange-service-1:
+    build:
+      context: ./currency-exchange-service
+      dockerfile: Dockerfile
+    container_name: currency-exchange-service-1
+    ports:
+      - "8000:8000"
+    environment:
+      - SPRING_APPLICATION_NAME=currency-exchange
+      - SERVER_PORT=8000
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://naming-server:8761/eureka
+      - SPRING_CONFIG_IMPORT=optional:configserver:http://config-server:8888
+    depends_on:
+      naming-server:
+        condition: service_healthy
+      config-server:
+        condition: service_healthy
+    networks:
+      - microservices-network
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:8000/actuator/health" ]
+      interval: 10s
+      timeout: 5s
+      start_period: 120s
+      retries: 5
+
+  # Currency Exchange Service (2nd instance)
+  currency-exchange-service-2:
+    build:
+      context: ./currency-exchange-service
+      dockerfile: Dockerfile
+    container_name: currency-exchange-service-2
+    ports:
+      - "8001:8000"
+    environment:
+      - SPRING_APPLICATION_NAME=currency-exchange
+      - SERVER_PORT=8000
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://naming-server:8761/eureka
+      - SPRING_CONFIG_IMPORT=optional:configserver:http://config-server:8888
+    depends_on:
+      naming-server:
+        condition: service_healthy
+      config-server:
+        condition: service_healthy
+    networks:
+      - microservices-network
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:8000/actuator/health" ]
+      interval: 10s
+      timeout: 5s
+      start_period: 120s
+      retries: 5
+
+  # Currency Exchange Service (3rd instance)
+  currency-exchange-service-3:
+    build:
+      context: ./currency-exchange-service
+      dockerfile: Dockerfile
+    container_name: currency-exchange-service-3
+    ports:
+      - "8002:8000"
+    environment:
+      - SPRING_APPLICATION_NAME=currency-exchange
+      - SERVER_PORT=8000
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://naming-server:8761/eureka
+      - SPRING_CONFIG_IMPORT=optional:configserver:http://config-server:8888
+    depends_on:
+      naming-server:
+        condition: service_healthy
+      config-server:
+        condition: service_healthy
+    networks:
+      - microservices-network
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:8000/actuator/health" ]
+      interval: 10s
+      timeout: 5s
+      start_period: 120s
+      retries: 5
+
+  # Currency Conversion Service (1st instance)
+  currency-conversion-service-1:
+    build:
+      context: ./currency-conversion-service
+      dockerfile: Dockerfile
+    container_name: currency-conversion-service-1
+    ports:
+      - "8100:8100"
+    environment:
+      - SPRING_APPLICATION_NAME=currency-conversion
+      - SERVER_PORT=8100
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://naming-server:8761/eureka
+      - SPRING_CONFIG_IMPORT=optional:configserver:http://config-server:8888
+    depends_on:
+      naming-server:
+        condition: service_healthy
+      config-server:
+        condition: service_healthy
+      currency-exchange-service-1:
+        condition: service_healthy
+    networks:
+      - microservices-network
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:8100/actuator/health" ]
+      interval: 10s
+      timeout: 5s
+      start_period: 120s
+      retries: 5
+
+  # Currency Conversion Service (2nd instance)
+  currency-conversion-service-2:
+    build:
+      context: ./currency-conversion-service
+      dockerfile: Dockerfile
+    container_name: currency-conversion-service-2
+    ports:
+      - "8101:8100"
+    environment:
+      - SPRING_APPLICATION_NAME=currency-conversion
+      - SERVER_PORT=8100
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://naming-server:8761/eureka
+      - SPRING_CONFIG_IMPORT=optional:configserver:http://config-server:8888
+    depends_on:
+      naming-server:
+        condition: service_healthy
+      config-server:
+        condition: service_healthy
+      currency-exchange-service-1:
+        condition: service_healthy
+    networks:
+      - microservices-network
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:8100/actuator/health" ]
+      interval: 10s
+      timeout: 5s
+      start_period: 120s
+      retries: 5
+
+  # Currency Conversion Service (3rd instance)
+  currency-conversion-service-3:
+    build:
+      context: ./currency-conversion-service
+      dockerfile: Dockerfile
+    container_name: currency-conversion-service-3
+    ports:
+      - "8102:8100"
+    environment:
+      - SPRING_APPLICATION_NAME=currency-conversion
+      - SERVER_PORT=8100
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://naming-server:8761/eureka
+      - SPRING_CONFIG_IMPORT=optional:configserver:http://config-server:8888
+    depends_on:
+      naming-server:
+        condition: service_healthy
+      config-server:
+        condition: service_healthy
+      currency-exchange-service-1:
+        condition: service_healthy
+    networks:
+      - microservices-network
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:8100/actuator/health" ]
+      interval: 10s
+      timeout: 5s
+      start_period: 120s
+      retries: 5
+
+  # Limits Service
+  limits-service:
+    build:
+      context: ./limits-service
+      dockerfile: Dockerfile
+    container_name: limits-service
+    ports:
+      - "8085:8085"
+    environment:
+      - SPRING_APPLICATION_NAME=limits-service
+      - SERVER_PORT=8085
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://naming-server:8761/eureka
+      - SPRING_CONFIG_IMPORT=optional:configserver:http://config-server:8888
+    depends_on:
+      naming-server:
+        condition: service_healthy
+      config-server:
+        condition: service_healthy
+    networks:
+      - microservices-network
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:8085/actuator/health" ]
+      interval: 10s
+      timeout: 5s
+      start_period: 120s
+      retries: 5
+
+  # API Gateway (last service to start)
+  api-gateway:
+    build:
+      context: ./api-gateway
+      dockerfile: Dockerfile
+    container_name: api-gateway
+    ports:
+      - "8765:8765"
+    environment:
+      - SPRING_APPLICATION_NAME=api-gateway
+      - SERVER_PORT=8765
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://naming-server:8761/eureka
+      - SPRING_CONFIG_IMPORT=optional:configserver:http://config-server:8888
+    depends_on:
+      naming-server:
+        condition: service_healthy
+      config-server:
+        condition: service_healthy
+      currency-conversion-service-1:
+        condition: service_healthy
+      currency-exchange-service-1:
+        condition: service_healthy
+      limits-service:
+        condition: service_healthy
+    networks:
+      - microservices-network
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:8765/actuator/health" ]
+      interval: 10s
+      timeout: 5s
+      start_period: 150s
+      retries: 5
+
+networks:
+  microservices-network:
+    driver: bridge
